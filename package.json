@@ -1,0 +1,24 @@
+{
+  "name": "discord-summary-bot",
+  "version": "1.0.0",
+  "description": "A Discord bot that summarizes messages using OpenAI",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "setup": "node setup.js"
+  },
+  "keywords": ["discord", "bot", "summary", "openai"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "@google/genai": "^1.12.0",
+    "dotenv": "^16.3.1",
+    "moment-timezone": "^0.5.43",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+} 
