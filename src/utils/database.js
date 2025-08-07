@@ -17,10 +17,16 @@ class Database {
                     language TEXT DEFAULT 'en',
                     region TEXT DEFAULT 'UTC',
                     thread_mode BOOLEAN DEFAULT 0,
+                    assistant_provider TEXT,
+                    assistant_model TEXT,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             `);
+
+            // Best-effort ALTERs for existing DBs
+            this.db.run("ALTER TABLE users ADD COLUMN assistant_provider TEXT", () => {});
+            this.db.run("ALTER TABLE users ADD COLUMN assistant_model TEXT", () => {});
 
             // User modes table for storing user's summary modes
             this.db.run(`
@@ -60,7 +66,9 @@ class Database {
                         gemini_api_key: null,
                         language: 'en',
                         region: 'UTC',
-                        thread_mode: false
+                        thread_mode: false,
+                        assistant_provider: null,
+                        assistant_model: null
                     });
                 }
             );
@@ -69,11 +77,11 @@ class Database {
 
     async updateUserSettings(userId, settings) {
         return new Promise((resolve, reject) => {
-            const { gemini_api_key, language, region, thread_mode } = settings;
+            const { gemini_api_key, language, region, thread_mode, assistant_provider, assistant_model } = settings;
             this.db.run(
-                `INSERT OR REPLACE INTO users (user_id, gemini_api_key, language, region, thread_mode, updated_at)
-                 VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-                [userId, gemini_api_key, language, region, thread_mode ? 1 : 0],
+                `INSERT OR REPLACE INTO users (user_id, gemini_api_key, language, region, thread_mode, assistant_provider, assistant_model, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+                [userId, gemini_api_key, language, region, thread_mode ? 1 : 0, assistant_provider, assistant_model],
                 function(err) {
                     if (err) reject(err);
                     else resolve(this.lastID);

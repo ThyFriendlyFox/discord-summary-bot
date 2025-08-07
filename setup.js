@@ -9,6 +9,10 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
+const args = new Set(process.argv.slice(2));
+const NON_INTERACTIVE = args.has('--non-interactive') || args.has('-n');
+const ASSUME_YES = args.has('--yes') || args.has('-y');
+
 console.log('🤖 Discord Summary Bot Setup');
 console.log('=============================\n');
 
@@ -25,35 +29,48 @@ async function setup() {
         // Check if .env exists
         const envPath = path.join(__dirname, '.env');
         if (fs.existsSync(envPath)) {
-            const overwrite = await question('A .env file already exists. Do you want to overwrite it? (y/N): ');
-            if (overwrite.toLowerCase() !== 'y' && overwrite.toLowerCase() !== 'yes') {
-                console.log('Setup cancelled.');
-                rl.close();
-                return;
+            if (!ASSUME_YES && !NON_INTERACTIVE) {
+                const overwrite = await question('A .env file already exists. Do you want to overwrite it? (y/N): ');
+                if (overwrite.toLowerCase() !== 'y' && overwrite.toLowerCase() !== 'yes') {
+                    console.log('Setup cancelled.');
+                    rl.close();
+                    return;
+                }
             }
         }
 
         // Get Discord Bot Token
         console.log('\n1. Discord Bot Configuration');
         console.log('============================');
-        const botToken = await question('Enter your Discord Bot Token: ');
-        
-        if (!botToken || botToken === 'your_discord_bot_token_here') {
-            console.log('❌ Invalid bot token. Please get your bot token from the Discord Developer Portal.');
-            rl.close();
-            return;
-        }
+        let botToken;
+        let clientId;
+        let geminiKey;
 
-        // Get Bot Client ID
-        const clientId = await question('Enter your Bot Client ID (optional, will be auto-detected if left empty): ');
-        
-        // Get Gemini API Key
-        console.log('\n2. Gemini Configuration');
-        console.log('======================');
-        const geminiKey = await question('Enter your Gemini API Key (optional, users can set their own): ');
-        
-        if (geminiKey && geminiKey.length < 10) {
-            console.log('⚠️  Warning: Gemini API key seems too short. Please verify your key.');
+        if (NON_INTERACTIVE) {
+            botToken = process.env.DISCORD_TOKEN;
+            clientId = process.env.BOT_CLIENT_ID;
+            geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+            if (!botToken || botToken === 'your_discord_bot_token_here') {
+                console.log('❌ Missing DISCORD_TOKEN environment variable. Provide it and re-run with --non-interactive.');
+                rl.close();
+                return;
+            }
+        } else {
+            botToken = await question('Enter your Discord Bot Token: ');
+            if (!botToken || botToken === 'your_discord_bot_token_here') {
+                console.log('❌ Invalid bot token. Please get your bot token from the Discord Developer Portal.');
+                rl.close();
+                return;
+            }
+            // Get Bot Client ID
+            clientId = await question('Enter your Bot Client ID (optional, will be auto-detected if left empty): ');
+            // Get Gemini API Key
+            console.log('\n2. Gemini Configuration');
+            console.log('======================');
+            geminiKey = await question('Enter your Gemini API Key (optional, users can set their own): ');
+            if (geminiKey && geminiKey.length < 10) {
+                console.log('⚠️  Warning: Gemini API key seems too short. Please verify your key.');
+            }
         }
 
         // Create .env file

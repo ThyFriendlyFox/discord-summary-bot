@@ -16,7 +16,7 @@ cp env.example .env
 ```
 Then edit `.env` with your credentials.
 
-### 2. Install Dependencies
+### 2. Install Dependencies (Node 20+ required)
 ```bash
 npm install
 ```

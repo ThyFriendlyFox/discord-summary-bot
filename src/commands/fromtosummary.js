@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const GeminiService = require('../services/gemini');
 const Database = require('../utils/database');
+const { fetchMessagesPaginated } = require('../utils/fetchMessages');
 const moment = require('moment-timezone');
 
 module.exports = {
@@ -86,12 +87,12 @@ module.exports = {
                 }
             }
 
-            // Fetch messages in the time range
-            const messages = await interaction.channel.messages.fetch({ limit: 2000 });
-            const messageArray = Array.from(messages.values()).filter(msg => {
+            // Fetch up to 2000 recent messages with pagination, then filter by time
+            const fetched = await fetchMessagesPaginated(interaction.channel, 2000);
+            const messageArray = fetched.filter(msg => {
                 const msgTime = moment.tz(msg.createdTimestamp, userTimezone);
                 return msgTime.isBetween(startTime, endTime, null, '[]'); // inclusive
-            }).reverse();
+            }).sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
             if (messageArray.length === 0) {
                 return interaction.editReply({

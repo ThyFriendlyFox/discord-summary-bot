@@ -4,7 +4,7 @@ This guide will walk you through setting up and running your Discord Summary Bot
 
 ## Prerequisites
 
-- Node.js 16.9.0 or higher
+- Node.js 20 or higher
 - A Discord account
 - A Gemini API key (optional - users can set their own)
 

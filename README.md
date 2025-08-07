@@ -26,11 +26,12 @@ A powerful Discord bot that summarizes messages using Google's Gemini API. Featu
 - `/support` - Get a link to the support server
 - `/vote` - Vote for the bot on top.gg
 - `/update` - Check the latest updates
+ - `/assistant` - Chat with the built-in AI assistant
 
 ## Setup
 
 ### Prerequisites
-- Node.js 16.9.0 or higher
+- Node.js 20 or higher
 - A Discord bot token
 - Gemini API key (optional - users can set their own)
 
@@ -58,6 +59,14 @@ cp env.example .env
 ```bash
 npm start
 ```
+### Interactive CLI Menu
+
+```bash
+npm run menu
+```
+
+From the menu you can setup `.env`, start the bot, run in dev, and launch an interactive assistant chat.
+
 
 For development with auto-restart:
 ```bash

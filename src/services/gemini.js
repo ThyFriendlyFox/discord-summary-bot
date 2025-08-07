@@ -2,7 +2,9 @@ const { GoogleGenAI } = require('@google/genai');
 
 class GeminiService {
     constructor() {
-        this.ai = new GoogleGenAI({});
+        // Prefer explicit API key from env to avoid relying on SDK-specific env names
+        const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+        this.ai = apiKey ? new GoogleGenAI({ apiKey }) : new GoogleGenAI({});
     }
 
     async summarizeMessages(messages, userSettings = {}, customApiKey = null) {

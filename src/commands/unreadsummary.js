@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const GeminiService = require('../services/gemini');
 const Database = require('../utils/database');
+const { fetchMessagesPaginated } = require('../utils/fetchMessages');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -45,13 +46,12 @@ module.exports = {
                 }
             }
 
-            // Fetch messages since the last message
-            const messages = await interaction.channel.messages.fetch({ 
-                after: lastMessageData.message_id,
-                limit: 2000 
-            });
-            
-            const messageArray = Array.from(messages.values()).reverse();
+            // Fetch messages since the last message with pagination
+            const messageArray = await fetchMessagesPaginated(
+                interaction.channel,
+                2000,
+                { afterId: lastMessageData.message_id }
+            );
 
             if (messageArray.length === 0) {
                 return interaction.editReply({

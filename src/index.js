@@ -32,6 +32,12 @@ for (const file of commandFiles) {
     }
 }
 
+// Ensure data directory exists before initializing database
+const dataDir = path.join(__dirname, '../data');
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+}
+
 // Initialize database
 const db = new Database();
 
